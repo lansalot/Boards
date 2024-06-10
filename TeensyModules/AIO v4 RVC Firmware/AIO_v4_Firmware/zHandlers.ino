@@ -223,7 +223,7 @@ void BuildNmea(void)
 
     strcat(nmea, "\r\n");
 
-    SerialAOG.write(nmea);  //Always send USB GPS data
+    //SerialAOG.write(nmea);  //Always send USB GPS data
 
 
     int len = strlen(nmea);
