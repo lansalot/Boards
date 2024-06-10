@@ -311,11 +311,22 @@ void autosteerLoop()
             currentState = 0;
             steerSwitch = 0;
         }
-        else
+    }
+
+    // If AOG has stopped steering, wait then turn off steerswitch ready for next engage.
+    static int switchCounter = 0;
+
+    if (steerSwitch == 0 && guidanceStatus == 0)
+    {
+        if (switchCounter++ > 30)
         {
             currentState = 1;
             steerSwitch = 1;
         }
+    }
+    else
+    {
+        switchCounter = 0;
     }
 
     // Arduino software button code

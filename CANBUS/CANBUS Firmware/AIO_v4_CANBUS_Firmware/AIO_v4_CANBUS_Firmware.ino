@@ -836,7 +836,7 @@ boolean intendToSteer = 0;        //Do We Intend to Steer?
           if (rvc.read(&bnoData)) useBNO08xRVC = true;
       }
 
-      if (useBNO08xRVC && bnoTimer > 40 && bnoTrigger)
+      if (useBNO08xRVC && bnoTimer > 70 && bnoTrigger)
       {
           bnoTrigger = false;
           imuHandler();   //Get IMU data ready

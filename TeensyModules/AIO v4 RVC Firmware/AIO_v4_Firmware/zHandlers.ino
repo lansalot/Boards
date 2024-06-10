@@ -71,6 +71,7 @@ void GGA_Handler() //Rec'd GGA
 
     blink = !blink;
     bnoTrigger = true;
+    bnoTimer = 0;
 
     if (useDual)
     {
