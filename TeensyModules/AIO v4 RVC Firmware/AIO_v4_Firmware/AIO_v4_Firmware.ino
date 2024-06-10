@@ -271,7 +271,7 @@ void loop()
     //RVC BNO08x
     if (rvc.read(&bnoData)) useBNO08xRVC = true;
 
-    if (useBNO08xRVC && bnoTimer > 40 && bnoTrigger)
+    if (useBNO08xRVC && bnoTimer > 70 && bnoTrigger)
     {
         bnoTrigger = false;
         imuHandler();   //Get IMU data ready

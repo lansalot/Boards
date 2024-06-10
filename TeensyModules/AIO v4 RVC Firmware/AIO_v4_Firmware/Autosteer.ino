@@ -311,16 +311,27 @@ void autosteerLoop()
     // 2 Has tablet button been pressed?
     if (guidanceStatusChanged)
     {
-      if (guidanceStatus == 1) // Must have changed Off >> On
-      {
-        currentState = 0;
-        steerSwitch = 0;
-      }
-      else
-      {
-        currentState = 1;
-        steerSwitch = 1;
-      }
+        if (guidanceStatus == 1)    //Must have changed Off >> On
+        {
+            currentState = 0;
+            steerSwitch = 0;
+        }
+    }
+
+    // If AOG has stopped steering, wait then turn off steerswitch ready for next engage.
+    static int switchCounter = 0;
+
+    if (steerSwitch == 0 && guidanceStatus == 0)
+    {
+        if (switchCounter++ > 30)
+        {
+            currentState = 1;
+            steerSwitch = 1;
+        }
+    }
+    else
+    {
+        switchCounter = 0;
     }
 
     // Arduino software button code
