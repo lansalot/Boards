@@ -6,6 +6,7 @@
    So don't claim it as your own
 */
 
+#include "Machine.h"
 ////////////////// User Settings /////////////////////////
 
 // How many degrees before decreasing Max PWM
@@ -566,7 +567,7 @@ void ReceiveUdp()
 
     if (autoSteerUdpData[0] == 0x80 && autoSteerUdpData[1] == 0x81 && autoSteerUdpData[2] == 0x7F) // Data
     {
-      if (autoSteerUdpData[3] == 0xFE && Autosteer_running) // 254
+      if (autoSteerUdpData[3] == 0xFE && Autosteer_running) // 254, steer data
       {
         gpsSpeed = ((float)(autoSteerUdpData[5] | autoSteerUdpData[6] << 8)) * 0.1;
         gpsSpeedUpdateTimer = 0;
@@ -660,7 +661,7 @@ void ReceiveUdp()
       }
 
       // steer settings
-      else if (autoSteerUdpData[3] == 0xFC && Autosteer_running) // 252
+      else if (autoSteerUdpData[3] == 0xFC && Autosteer_running) // 252, steer settings
       {
         // PID values
         steerSettings.Kp = ((float)autoSteerUdpData[5]); // read Kp from AgOpenGPS
@@ -762,7 +763,8 @@ void ReceiveUdp()
         steerConfigInit();
 
       } // end FB
-      else if (autoSteerUdpData[3] == 0xC8) // 200 - Hello from AgIO
+      
+      else if (autoSteerUdpData[3] == 0xC8) // 200 - Hello from AgIO (not in spreadsheet?)
       {
         if (Autosteer_running)
         {
@@ -802,7 +804,7 @@ void ReceiveUdp()
       } // end 201
 
       // whoami
-      else if (autoSteerUdpData[3] == 0xCA) // 202
+      else if (autoSteerUdpData[3] == 0xCA) // 202, network scan request
       {
         // make really sure this is the reply pgn
         if (autoSteerUdpData[4] == 3 && autoSteerUdpData[5] == 202 && autoSteerUdpData[6] == 202)
@@ -829,9 +831,14 @@ void ReceiveUdp()
           SendUdp(scanReply, sizeof(scanReply), ipDest, portDest);
         }
       }
+
       else if (autoSteerUdpData[3] == 0xED) // 237 machine board shizz I think
       {
-        Serial.println("MC yo!!");
+      }
+      else if (autoSteerUdpData[3] == 0xE5) // 229 64-bit sections
+      {
+        memcpy(aogSections, &autoSteerUdpData[5], 8);
+        printArrayInBinary(aogSections, sizeof(aogSections));
       }
     } // end if 80 81 7F
   }

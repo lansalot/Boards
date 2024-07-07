@@ -26,6 +26,7 @@
 
 /************************* User Settings *************************/
 // Serial Ports
+#include "CANBUS.h"
 #define SerialAOG Serial                //AgIO USB conection
 #define SerialRTK Serial3               //RTK radio
 HardwareSerial* SerialGPS = &Serial7;   //Main postion receiver (GGA)
@@ -51,6 +52,7 @@ const int32_t baudRTK = 115200;     // most are using Xbee radios with default o
 
 /*****************************************************************/
 
+#include "Machine.h"
 #include "zNMEAParser.h"
 #include <Wire.h>
 #include "BNO_RVC.h"
