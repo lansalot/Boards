@@ -134,6 +134,16 @@ float roll = 0;
 float pitch = 0;
 float yaw = 0;
 
+// Keya Code
+#include <FlexCAN_T4.h>
+// CRX1/CTX1 on Teensy are CAN1 on Tony's board
+// CRX2/CTX2 on Teensy are CAN2 on AIO board, CAN2 on Tony's board
+// CRX3/CTX3 on Teensy are CAN1 on AIO board, CAN3 on Tony's board
+FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_256> Keya_Bus;
+int8_t KeyaCurrentSensorReading = 0;
+bool keyaDetected = false;
+
+
 // Setup procedure ------------------------
 void setup()
 {
@@ -197,11 +207,15 @@ void setup()
     }
     if (!useBNO08xRVC)  Serial.println("No Serial BNO08x not Connected or Found");
 
+    CAN_Setup();
+
   Serial.println("\r\nEnd setup, waiting for GPS...\r\n");
 }
 
 void loop()
 {
+    KeyaBus_Receive();
+
     // Read incoming nmea from GPS
     if (SerialGPS->available())
     {
