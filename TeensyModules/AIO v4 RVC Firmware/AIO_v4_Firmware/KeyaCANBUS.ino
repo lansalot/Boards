@@ -86,11 +86,12 @@ void keyaSend(uint8_t data[8]) {
 //}	
 
 void disableKeyaSteer() {
-#ifdef IsNewModel
+//#ifndef IsNewModel
 	uint8_t buf[] = { 0x23, 0x0c, 0x20, 0x01, 0, 0, 0, 0 };
-#else
-	uint8_t buf[] = { 0x03, 0x0d, 0x20, 0x11, 0, 0, 0, 0 };
-#endif
+//#else
+//	uint8_t buf[] = { 0x03, 0x0d, 0x20, 0x11, 0, 0, 0, 0 };
+//#endif
+	//Serial.println("Disabling!");
 	keyaSend(buf);
 }
 
