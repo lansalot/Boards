@@ -366,3 +366,4 @@ Support/TeensyModules/Firmware/Autosteer_gps_teensy_v5_5/__vm/.Autosteer_gps_tee
 __vm/
 .vscode/
 output/
+/TeensyModules/AIO v4 RVC Firmware/AIO_v4_Firmware/build/teensy.avr.teensy41

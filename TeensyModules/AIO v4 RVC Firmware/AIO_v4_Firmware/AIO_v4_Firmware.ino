@@ -64,6 +64,7 @@ elapsedMillis bnoTimer;
 bool bnoTrigger = false;
 bool useBNO08xRVC = false;
 
+
 struct ConfigIP
 {
     uint8_t ipOne = 192;
@@ -142,7 +143,9 @@ float yaw = 0;
 FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_256> Keya_Bus;
 int8_t KeyaCurrentSensorReading = 0;
 bool keyaDetected = false;
-
+bool aogRecent = false;         // to suppress keya detection/re-enable if we haven't seen AOG recently
+elapsedMillis steerEnableTimer; // when steering is enabled, suppress keya current feedback so spike doesn't disable steering
+uint16_t keyaCurrentSuppressionTime = 1500; // 1.5 seconds
 
 // Setup procedure ------------------------
 void setup()

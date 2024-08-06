@@ -285,6 +285,7 @@ void autosteerLoop()
 			currentState = 1;
 			Serial.println("Lost connection to AOG - disabling Keya commands");
 			keyaDetected = false;
+			aogRecent = false;
 		}
 
 		//read all the switches
@@ -500,7 +501,7 @@ void autosteerLoop()
 				}
 			}
 			else digitalWrite(DIR1_RL_ENABLE, 0); //IBT2
-
+			aogRecent = false;
 			pwmDrive = 0; //turn off steering motor
 			motorDrive(); //out to motors the pwm value
 			pulseCount = 0;
@@ -579,7 +580,8 @@ void ReceiveUdp()
 
 				guidanceStatus = autoSteerUdpData[7];
 				guidanceStatusChanged = (guidanceStatus != prevGuidanceStatus);
-
+				//Serial.println("STEER STATUS " + String(guidanceStatus));
+				if (guidanceStatusChanged && guidanceStatus == 1) { steerEnableTimer = 0; }
 				//Bit 8,9    set point steer angle * 100 is sent
 				steerAngleSetPoint = ((float)(autoSteerUdpData[8] | ((int8_t)autoSteerUdpData[9]) << 8)) * 0.01; //high low bytes
 
@@ -732,6 +734,7 @@ void ReceiveUdp()
 			}//end FB
 			else if (autoSteerUdpData[3] == 200) // Hello from AgIO
 			{
+				aogRecent = true;
 				if (Autosteer_running)
 				{
 					int16_t sa = (int16_t)(steerAngleActual * 100);

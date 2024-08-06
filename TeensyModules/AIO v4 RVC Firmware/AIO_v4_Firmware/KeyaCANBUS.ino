@@ -86,12 +86,12 @@ void keyaSend(uint8_t data[8]) {
 //}	
 
 void disableKeyaSteer() {
-//#ifndef IsNewModel
+	//#ifndef IsNewModel
 	uint8_t buf[] = { 0x23, 0x0c, 0x20, 0x01, 0, 0, 0, 0 };
-//#else
-//	uint8_t buf[] = { 0x03, 0x0d, 0x20, 0x11, 0, 0, 0, 0 };
-//#endif
-	//Serial.println("Disabling!");
+	//#else
+	//	uint8_t buf[] = { 0x03, 0x0d, 0x20, 0x11, 0, 0, 0, 0 };
+	//#endif
+		//Serial.println("Disabling!");
 	keyaSend(buf);
 }
 
@@ -110,7 +110,6 @@ void SteerKeya(int steerSpeed, float fSteerSpeed) {
 #endif
 	if (pwmDrive == 0) {
 		disableKeyaSteer();
-		//if (debugKeya) Serial.println("pwmDrive zero - disabling");
 		return; // don't need to go any further, if we're disabling, we're disabling
 	}
 	//if (debugKeya) Serial.println("told to steer, with " + String(steerSpeed) + " so I converted that to speed " + String(actualSpeed));
@@ -169,8 +168,12 @@ void KeyaBus_Receive() {
 			keyaMotorStatus = !bitRead(KeyaBusReceiveData.buf[7], 0);
 			if (!keyaDetected) {
 				if (debugKeya) Serial.println("Keya heartbeat detected! Enabling Keya canbus & using reported motor current for disengage");
-				//SendUdpFreeForm("Keya motor signature detected - I'll steer that way!", Eth_ipDestination, portDestination);
-				keyaDetected = true;
+				if (!aogRecent) {
+					if (debugKeya) Serial.println("...but no aogRecent so not enabling");
+				}
+				else {
+					keyaDetected = true;
+				}
 			}
 			// 0-1 - Cumulative value of angle (360 def / circle)
 			// 2-3 - Motor speed, signed int eg -500 or 500
@@ -183,13 +186,19 @@ void KeyaBus_Receive() {
 			//KeyaCurrentSensorReading = abs(KeyaBusReceiveData.buf[4]) * 20;
 
 			if (KeyaBusReceiveData.buf[4] == 0xFF) {
-				KeyaCurrentSensorReading = (0.9 * KeyaCurrentSensorReading) + (0.1 * (256 - KeyaBusReceiveData.buf[5]) * 20);
-				//Serial.println("Current reading: " + String(KeyaCurrentSensorReading));
+				KeyaCurrentSensorReading = (256 - KeyaBusReceiveData.buf[5]) * 20;
+				//KeyaCurrentSensorReading = (0.9 * KeyaCurrentSensorReading) + (0.1 * (256 - KeyaBusReceiveData.buf[5]) * 20);
 			}
 			else {
-				KeyaCurrentSensorReading = (0.9 * KeyaCurrentSensorReading) + (0.1 * KeyaBusReceiveData.buf[5]);
+				KeyaCurrentSensorReading = KeyaBusReceiveData.buf[5] * 20;
+				//KeyaCurrentSensorReading = (0.9 * KeyaCurrentSensorReading) + (0.1 * KeyaBusReceiveData.buf[5]);
 			}
+			if (steerEnableTimer <= keyaCurrentSuppressionTime) {
+				//if (debugKeya) Serial.println("... but current sensor reading suppressed for steer startup " + 
+				//	String(steerEnableTimer) + " " + String(keyaCurrentSuppressionTime));
 
+				KeyaCurrentSensorReading = 1; // don't trust the current sensor for $TIME after enabling steering
+			}
 			//if (debugKeya) Serial.println("Heartbeat current is " + String(KeyaCurrentSensorReading));
 
 			if (KeyaBusReceiveData.buf[7] != 0) {
