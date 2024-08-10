@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{D8922FBE-50EB-4669-B3BC-390BCFCCD6AA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sims", "Sims", "{C42709DD-A57E-44D1-B355-C9FC035A877A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SteerSim", "SteerSim", "{09DF21B5-9C4E-4DA5-BC0C-73DD4B19BCC0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteerSim", "Misc\Sims\SteerSim\SteerSim\SteerSim.csproj", "{40D973B5-8485-4321-8664-F1E470EFD3C0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UDP_Sim", "UDP_Sim", "{E218838F-6098-4DB3-BE9E-CBC514FE25CF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UDP_Sim", "Misc\Sims\UDP_Sim\UDP_Sim\UDP_Sim.csproj", "{F07C4510-D962-4C63-B0C9-DCEB520586C3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{40D973B5-8485-4321-8664-F1E470EFD3C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40D973B5-8485-4321-8664-F1E470EFD3C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40D973B5-8485-4321-8664-F1E470EFD3C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40D973B5-8485-4321-8664-F1E470EFD3C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F07C4510-D962-4C63-B0C9-DCEB520586C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F07C4510-D962-4C63-B0C9-DCEB520586C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F07C4510-D962-4C63-B0C9-DCEB520586C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F07C4510-D962-4C63-B0C9-DCEB520586C3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C42709DD-A57E-44D1-B355-C9FC035A877A} = {D8922FBE-50EB-4669-B3BC-390BCFCCD6AA}
+		{09DF21B5-9C4E-4DA5-BC0C-73DD4B19BCC0} = {C42709DD-A57E-44D1-B355-C9FC035A877A}
+		{40D973B5-8485-4321-8664-F1E470EFD3C0} = {09DF21B5-9C4E-4DA5-BC0C-73DD4B19BCC0}
+		{E218838F-6098-4DB3-BE9E-CBC514FE25CF} = {C42709DD-A57E-44D1-B355-C9FC035A877A}
+		{F07C4510-D962-4C63-B0C9-DCEB520586C3} = {E218838F-6098-4DB3-BE9E-CBC514FE25CF}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3C122377-A338-4CEC-9A8F-7F4CC78A5F73}
+	EndGlobalSection
+EndGlobal

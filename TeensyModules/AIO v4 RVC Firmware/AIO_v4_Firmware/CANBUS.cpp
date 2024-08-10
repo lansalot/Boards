@@ -41,7 +41,7 @@ uint32_t lastCANCommand; // Need to delay processing CANBUS messages for a bit, 
 
 // Claas
 //int CANInfo[3] = { 0x18EF1CD2 , 2, 0xC4}; // Claas arion engage
-//int CANInfo[3] = { 0x10374D4C , 2, 0xC4}; // Claas lexion engage
+//int CANInfo[3] = { 0x10374D4C , 2, 0xC4}; // Claas lexion engage or could be 0x10
 
 
 // Valtra
