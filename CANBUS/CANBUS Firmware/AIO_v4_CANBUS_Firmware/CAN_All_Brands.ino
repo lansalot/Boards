@@ -464,10 +464,7 @@ void VBus_Receive()
             {
                 if ((VBusReceiveData.buf[0])== 15 && (VBusReceiveData.buf[1])== 96 && (VBusReceiveData.buf[2])== 1)
                 {
-                    Time = millis();
-                    digitalWrite(engageLED,HIGH); 
-                    engageCAN = 1;
-                    relayTime = ((millis() + 1000));
+                    CAN_Engage();    
                 }
             } 
 
