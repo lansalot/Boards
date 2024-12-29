@@ -2,7 +2,7 @@
 
 Click on the green "Code" button above and select "Download Zip" to download the entire support folder.
 
-The [AgOpenGPS Hardware Wiki](https://github.com/AgHardware/Boards/wiki)
+The [AgOpenGPS Hardware Wiki](https://github.com/AgOpenGPS-Official/Boards/wiki)
 
 In this repository are many files containing the firmware and pcb layouts to make the hardware for AgOpenGPS.
 
