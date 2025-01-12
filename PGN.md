@@ -1,4 +1,42 @@
-# Steer Module
+# AOG message format
+
+An AOG message of length `n` has the following general format:
+
+<table>
+    <thead>
+        <tr>
+            <th nowrap align=center>Byte 0</th>
+            <th nowrap align=center>Byte 1</th>
+            <th nowrap align=center>Byte 2</th>
+            <th nowrap align=center>Byte 3</th>
+            <th nowrap align=center>Byte 4</th>
+            <th nowrap align=center>...</th>
+            <th nowrap align=center>Byte n-1</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td align=center>0x80</td>
+            <td align=center>0x81</td>
+            <td align=center>Src</td>
+            <td align=center>PGN</td>
+            <td align=center>Len</td>
+            <td align=center>Data</td>
+            <td align=center>CRC</td>
+        </tr>
+    </tbody>
+</table>
+
+- The first two bytes consist of the preamble 0x80 & 0x81 to identify AOG messages.
+- **Src**: The source (sender) of the message.
+- **PGN**: The message identifier (Parameter Group Number) listed below.
+- **Len**: The length of the message (only counting **Data** in bytes).
+- **Data**: The actual data corresponding to the respective **PGN**.
+- **CRC**: Checksum of the message (sum of byte 2 - n-2).
+
+# PGN list
+
+## Steer Module
 
 IP = 192.168.5.126<br>
 Hello = 126<br>
@@ -112,7 +150,7 @@ Port = 5126<br>
 <br>
 <br>
 
-# Machine Module
+## Machine Module
 
 IP = 192.168.5.123<br>
 Hello = 123<br>
@@ -317,7 +355,7 @@ Port = 5123<br>
 <br>
 <br>
 
-# IMU
+## IMU
 
 IP = 192.168.5.121<br>
 Hello = 121<br>
@@ -368,7 +406,7 @@ Port = 5121<br>
 <br>
 <br>
 
-# GPS
+## GPS
 
 IP = 192.168.5.124<br>
 Hello = na<br>
@@ -413,7 +451,7 @@ Port = 5124<br>
 <br>
 <br>
 
-# Tool GPS
+## Tool GPS
 
 IP = 192.168.5.125<br>
 Hello = 125<br>
@@ -458,7 +496,7 @@ Port = 10000<br>
 <br>
 <br>
 
-# GPS/IMU/WAS
+## GPS/IMU/WAS
 
 IP = 192.168.5.122<br>
 Hello = ?<br>
@@ -504,7 +542,7 @@ Port = 5122<br>
 <br>
 <br>
 
-# Tool Steer
+## Tool Steer
 
 IP = 192.168.5.122<br>
 Hello = 122<br>
@@ -654,7 +692,8 @@ Port = 5122<br>
 <br>
 <br>
 
-# Hello Sent To Module
+## Hello Sent To Module
+
 <table>
     <thead>
         <tr>
@@ -690,7 +729,8 @@ Port = 5122<br>
 <br>
 <br>
 
-# Hello Reply to AgIO
+## Hello Reply to AgIO
+
 <table>
     <thead>
         <tr>
@@ -772,7 +812,8 @@ Port = 5122<br>
 <br>
 <br>
 
-# From AgIO
+## From AgIO
+
 <table>
     <thead>
         <tr>
@@ -824,7 +865,8 @@ Port = 5122<br>
 <br>
 <br>
 
-# Subnet Reply to AgIO
+## Subnet Reply to AgIO
+
 <table>
     <thead>
         <tr>
@@ -916,7 +958,8 @@ Port = 5122<br>
 <br>
 <br>
 
-# Subnet Reply to AgIO
+## Subnet Reply to AgIO
+
 <table>
     <thead>
         <tr>
