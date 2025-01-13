@@ -807,8 +807,8 @@ Port = 5122<br>
         </tr>
         <tr>
             <td align=center>Scan request</td>
-            <td align=center>7B</td>
-            <td align=center>123</td>
+            <td align=center>7F</td>
+            <td align=center>127</td>
             <td align=center>CA</td>
             <td align=center>202</td>
             <td align=center>3</td>
