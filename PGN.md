@@ -1027,6 +1027,78 @@ Port = 5122<br>
 <br>
 <br>
 
+## Hardware message
+
+<table>
+    <thead>
+        <tr>
+            <th nowrap align=center>PGN Name</th>
+            <th nowrap align=center>Src</th>
+            <th nowrap align=center>Dec</th>
+            <th nowrap align=center>PGN</th>
+            <th nowrap align=center>Dec</th>
+            <th nowrap align=center>Len</th>
+            <th nowrap align=center>Byte 5</th>
+            <th nowrap align=center>Byte 6</th>
+            <th nowrap align=center>...</th>
+            <th nowrap align=center>Byte n-1</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td align=center>Hardware Message</td>
+            <td align=center>7F</td>
+            <td align=center>127</td>
+            <td align=center>DD</td>
+            <td align=center>221</td>
+            <td align=center></td>
+            <td align=center>Duration [s]</td>
+            <td align=center>Color</td>
+            <td align=center>Message</td>
+            <td align=center>CRC</td>
+        </tr>
+    </tbody>
+</table>
+
+
+<br>
+<br>
+
+## Nudge by machine
+
+<table>
+    <thead>
+        <tr>
+            <th nowrap align=center>PGN Name</th>
+            <th nowrap align=center>Src</th>
+            <th nowrap align=center>Dec</th>
+            <th nowrap align=center>PGN</th>
+            <th nowrap align=center>Dec</th>
+            <th nowrap align=center>Len</th>
+            <th nowrap align=center>Byte 5</th>
+            <th nowrap align=center>Byte 6</th>
+            <th nowrap align=center>Byte 7</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td align=center>Nudge by Machine</td>
+            <td align=center>7F</td>
+            <td align=center>127</td>
+            <td align=center>DE</td>
+            <td align=center>222</td>
+            <td align=center></td>
+            <td align=center>Mask</td>
+            <td align=center>Left/right</td>
+            <td align=center>CRC</td>
+        </tr>
+    </tbody>
+</table>
+
+
+<br>
+<br>
+
 ## Subnet Reply to AgIO
 
 <table>
