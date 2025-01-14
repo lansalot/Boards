@@ -399,6 +399,17 @@ Port = 5121<br>
             <td align=center>0</td>
             <td align=center>CRC</td>
         </tr>
+        <tr>
+            <td align=center>IMU Disconnect</td>
+            <td align=center>7C</td>
+            <td align=center>124</td>
+            <td align=center>D4</td>
+            <td align=center>212</td>
+            <td align=center>2</td>
+            <td align=center>1</td>
+            <td align=center>0</td>
+            <td align=center>CRC</td>
+        </tr>
     </tbody>
 </table>
 
@@ -432,6 +443,49 @@ Port = 5124<br>
             <th nowrap align=center>Byte 11</th>
             <th nowrap align=center>Byte 12</th>
             <th nowrap align=center>Byte 13</th>
+            <th nowrap align=center>Byte 14</th>
+            <th nowrap align=center>Byte 15</th>
+            <th nowrap align=center>Byte 16</th>
+            <th nowrap align=center>Byte 17</th>
+            <th nowrap align=center>Byte 18</th>
+            <th nowrap align=center>Byte 19</th>
+            <th nowrap align=center>Byte 20</th>
+            <th nowrap align=center>Byte 21</th>
+            <th nowrap align=center>Byte 22</th>
+            <th nowrap align=center>Byte 23</th>
+            <th nowrap align=center>Byte 24</th>
+            <th nowrap align=center>Byte 25</th>
+            <th nowrap align=center>Byte 26</th>
+            <th nowrap align=center>Byte 27</th>
+            <th nowrap align=center>Byte 28</th>
+            <th nowrap align=center>Byte 29</th>
+            <th nowrap align=center>Byte 30</th>
+            <th nowrap align=center>Byte 31</th>
+            <th nowrap align=center>Byte 32</th>
+            <th nowrap align=center>Byte 33</th>
+            <th nowrap align=center>Byte 34</th>
+            <th nowrap align=center>Byte 35</th>
+            <th nowrap align=center>Byte 36</th>
+            <th nowrap align=center>Byte 37</th>
+            <th nowrap align=center>Byte 38</th>
+            <th nowrap align=center>Byte 39</th>
+            <th nowrap align=center>Byte 40</th>
+            <th nowrap align=center>Byte 41</th>
+            <th nowrap align=center>Byte 42</th>
+            <th nowrap align=center>Byte 43</th>
+            <th nowrap align=center>Byte 44</th>
+            <th nowrap align=center>Byte 45</th>
+            <th nowrap align=center>Byte 46</th>
+            <th nowrap align=center>Byte 47</th>
+            <th nowrap align=center>Byte 48</th>
+            <th nowrap align=center>Byte 49</th>
+            <th nowrap align=center>Byte 50</th>
+            <th nowrap align=center>Byte 51</th>
+            <th nowrap align=center>Byte 52</th>
+            <th nowrap align=center>Byte 53</th>
+            <th nowrap align=center>Byte 54</th>
+            <th nowrap align=center>Byte 55</th>
+            <th nowrap align=center>Byte 56</th>
         </tr>
     </thead>
     <tbody>
@@ -441,8 +495,23 @@ Port = 5124<br>
             <td align=center>124</td>
             <td align=center>D6</td>
             <td align=center>214</td>
-            <td align=center></td>
-            <td align=center>Main Antenna</td>
+            <td align=center>51</td>
+            <td align=center colspan=8>Longitude</td>
+            <td align=center colspan=8>Latitude</td>
+            <td align=center colspan=4>Heading true dual</td>
+            <td align=center colspan=4>Heading true</td>
+            <td align=center colspan=4>Speed</td>
+            <td align=center colspan=4>Roll</td>
+            <td align=center colspan=4>Altitude</td>
+            <td align=center colspan=2>Satellites tracked</td>
+            <td align=center>Fix quality</td>
+            <td align=center colspan=2>HDOP (x100)</td>
+            <td align=center colspan=2>Age (x100)</td>
+            <td align=center colspan=2>IMU heading</td>
+            <td align=center colspan=2>IMU roll</td>
+            <td align=center colspan=2>IMU pitch</td>
+            <td align=center colspan=2>IMU yaw rate</td>
+            <td align=center>CRC</td>
         </tr>
     </tbody>
 </table>
@@ -894,13 +963,13 @@ Port = 5122<br>
             <td align=center>CB</td>
             <td align=center>203</td>
             <td align=center>7</td>
-            <td align=center>ipOne</td>
-            <td align=center>ipTwo</td>
-            <td align=center>ipThree</td>
-            <td align=center>126</td>
-            <td align=center>SrcOne</td>
-            <td align=center>SrcTwo</td>
-            <td align=center>SrcThree</td>
+            <td align=center>IP_One</td>
+            <td align=center>IP_Two</td>
+            <td align=center>IP_Three</td>
+            <td align=center>IP_Four</td>
+            <td align=center>Subnet_One</td>
+            <td align=center>Subnet_Two</td>
+            <td align=center>Subnet_Three</td>
             <td align=center>CRC</td>
         </tr>
         <tr>
@@ -910,13 +979,13 @@ Port = 5122<br>
             <td align=center>CB</td>
             <td align=center>203</td>
             <td align=center>7</td>
-            <td align=center>ipOne</td>
-            <td align=center>ipTwo</td>
-            <td align=center>ipThree</td>
-            <td align=center>123</td>
-            <td align=center>SrcOne</td>
-            <td align=center>SrcTwo</td>
-            <td align=center>SrcThree</td>
+            <td align=center>IP_One</td>
+            <td align=center>IP_Two</td>
+            <td align=center>IP_Three</td>
+            <td align=center>IP_Four</td>
+            <td align=center>Subnet_One</td>
+            <td align=center>Subnet_Two</td>
+            <td align=center>Subnet_Three</td>
             <td align=center>CRC</td>
         </tr>
         <tr>
@@ -926,13 +995,13 @@ Port = 5122<br>
             <td align=center>CB</td>
             <td align=center>203</td>
             <td align=center>7</td>
-            <td align=center>ipOne</td>
-            <td align=center>ipTwo</td>
-            <td align=center>ipThree</td>
-            <td align=center>121</td>
-            <td align=center>SrcOne</td>
-            <td align=center>SrcTwo</td>
-            <td align=center>SrcThree</td>
+            <td align=center>IP_One</td>
+            <td align=center>IP_Two</td>
+            <td align=center>IP_Three</td>
+            <td align=center>IP_Four</td>
+            <td align=center>Subnet_One</td>
+            <td align=center>Subnet_Two</td>
+            <td align=center>Subnet_Three</td>
             <td align=center>CRC</td>
         </tr>
         <tr>
@@ -942,13 +1011,85 @@ Port = 5122<br>
             <td align=center>CB</td>
             <td align=center>203</td>
             <td align=center>7</td>
-            <td align=center>ipOne</td>
-            <td align=center>ipTwo</td>
-            <td align=center>ipThree</td>
-            <td align=center>120</td>
-            <td align=center>SrcOne</td>
-            <td align=center>SrcTwo</td>
-            <td align=center>SrcThree</td>
+            <td align=center>IP_One</td>
+            <td align=center>IP_Two</td>
+            <td align=center>IP_Three</td>
+            <td align=center>IP_Four</td>
+            <td align=center>Subnet_One</td>
+            <td align=center>Subnet_Two</td>
+            <td align=center>Subnet_Three</td>
+            <td align=center>CRC</td>
+        </tr>
+    </tbody>
+</table>
+
+
+<br>
+<br>
+
+## Hardware message
+
+<table>
+    <thead>
+        <tr>
+            <th nowrap align=center>PGN Name</th>
+            <th nowrap align=center>Src</th>
+            <th nowrap align=center>Dec</th>
+            <th nowrap align=center>PGN</th>
+            <th nowrap align=center>Dec</th>
+            <th nowrap align=center>Len</th>
+            <th nowrap align=center>Byte 5</th>
+            <th nowrap align=center>Byte 6</th>
+            <th nowrap align=center>...</th>
+            <th nowrap align=center>Byte n-1</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td align=center>Hardware Message</td>
+            <td align=center>7F</td>
+            <td align=center>127</td>
+            <td align=center>DD</td>
+            <td align=center>221</td>
+            <td align=center></td>
+            <td align=center>Duration [s]</td>
+            <td align=center>Color</td>
+            <td align=center>Message</td>
+            <td align=center>CRC</td>
+        </tr>
+    </tbody>
+</table>
+
+
+<br>
+<br>
+
+## Nudge by machine
+
+<table>
+    <thead>
+        <tr>
+            <th nowrap align=center>PGN Name</th>
+            <th nowrap align=center>Src</th>
+            <th nowrap align=center>Dec</th>
+            <th nowrap align=center>PGN</th>
+            <th nowrap align=center>Dec</th>
+            <th nowrap align=center>Len</th>
+            <th nowrap align=center>Byte 5</th>
+            <th nowrap align=center>Byte 6</th>
+            <th nowrap align=center>Byte 7</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td align=center>Nudge by Machine</td>
+            <td align=center>7F</td>
+            <td align=center>127</td>
+            <td align=center>DE</td>
+            <td align=center>222</td>
+            <td align=center></td>
+            <td align=center>Mask</td>
+            <td align=center>Left/right</td>
             <td align=center>CRC</td>
         </tr>
     </tbody>
