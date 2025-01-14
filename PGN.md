@@ -399,6 +399,17 @@ Port = 5121<br>
             <td align=center>0</td>
             <td align=center>CRC</td>
         </tr>
+        <tr>
+            <td align=center>IMU Disconnect</td>
+            <td align=center>7C</td>
+            <td align=center>124</td>
+            <td align=center>D4</td>
+            <td align=center>212</td>
+            <td align=center>2</td>
+            <td align=center>1</td>
+            <td align=center>0</td>
+            <td align=center>CRC</td>
+        </tr>
     </tbody>
 </table>
 
