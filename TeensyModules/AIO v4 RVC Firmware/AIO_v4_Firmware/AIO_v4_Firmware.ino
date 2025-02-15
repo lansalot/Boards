@@ -64,6 +64,18 @@ elapsedMillis bnoTimer;
 bool bnoTrigger = false;
 bool useBNO08xRVC = false;
 
+//I2C BNO085
+#define i2cBNO_REPORT_INTERVAL 20
+elapsedMillis i2cBNOTimer = 0;
+#include "BNO08x_AOG.h"
+bool useBNO08xI2C = false;
+
+// BNO08x address variables to check where it is
+const uint8_t bno08xAddresses[] = { 0x4A, 0x4B };
+const int16_t nrBNO08xAdresses = sizeof(bno08xAddresses) / sizeof(bno08xAddresses[0]);
+uint8_t bno08xAddress;
+BNO080 bno08x;
+
 struct ConfigIP
 {
     uint8_t ipOne = 192;
@@ -139,6 +151,7 @@ void setup()
 {
     delay(500);                       //Small delay so serial can monitor start up
     set_arm_clock(450000000);         //Set CPU speed to 150mhz
+    Serial.println("\r\n** AIO v4 Firmware 15.02.2025 **\r\n");
     Serial.print("CPU speed set to: ");
     Serial.println(F_CPU_ACTUAL);
 
@@ -195,7 +208,57 @@ void setup()
             break;
         }
     }
-    if (!useBNO08xRVC)  Serial.println("No Serial BNO08x not Connected or Found");
+    if (!useBNO08xRVC)
+    {
+        Serial.println("No Serial BNO08x not Connected or Found");
+
+        Serial.println("Checking for i2c BNO08x");
+
+        ImuWire.begin();
+
+        uint8_t error;
+
+        for (int16_t i = 0; i < nrBNO08xAdresses; i++)
+        {
+            bno08xAddress = bno08xAddresses[i];
+
+            ImuWire.beginTransmission(bno08xAddress);
+            error = ImuWire.endTransmission();
+
+            if (error == 0)
+            {
+                //Serial.println("Error = 0");
+                Serial.print("0x");
+                Serial.print(bno08xAddress, HEX);
+                Serial.println(" BNO08X Ok.");
+
+                // Initialize BNO080 lib
+                if (bno08x.begin(bno08xAddress, ImuWire)) //??? Passing NULL to non pointer argument, remove maybe ???
+                {
+                    //Increase I2C data rate to 400kHz
+                    ImuWire.setClock(400000);
+
+                    delay(300);
+
+                    bno08x.enableGameRotationVector(i2cBNO_REPORT_INTERVAL);
+                    i2cBNOTimer = 0;
+                    useBNO08xI2C = true;
+                }
+                else
+                {
+                    Serial.println("BNO080 not detected at given I2C address.");
+                }
+            }
+            else
+            {
+                //Serial.println("Error = 4");
+                Serial.print("0x");
+                Serial.print(bno08xAddress, HEX);
+                Serial.println(" BNO08X not Connected or Found");
+            }
+            if (useBNO08xI2C) break;
+        }
+    }
 
   Serial.println("\r\nEnd setup, waiting for GPS...\r\n");
 }
@@ -275,6 +338,13 @@ void loop()
     {
         bnoTrigger = false;
         imuHandler();   //Get IMU data ready
+    }
+
+    //i2c BNO08x
+    if (useBNO08xI2C && i2cBNOTimer > 20)
+    {
+        i2cBNOTimer = 0;
+        readBNO();
     }
     
     if (Autosteer_running) autosteerLoop();

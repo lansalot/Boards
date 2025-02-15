@@ -78,7 +78,7 @@ void GGA_Handler() //Rec'd GGA
        dualReadyGGA = true;
     }
 
-    else if (useBNO08xRVC)
+    else if (useBNO08xRVC || useBNO08xI2C)
     {
         BuildNmea();           //Build & send data GPS data to AgIO (Both Dual & Single)
         dualReadyGGA = false;  //Force dual GGA ready false because we just sent it to AgIO based off the IMU data
@@ -89,7 +89,7 @@ void GGA_Handler() //Rec'd GGA
         }
     }
 
-    else if (!useDual && !useBNO08xRVC) 
+    else if (!useDual && !useBNO08xRVC && !useBNO08xI2C) 
     {
         digitalWrite(GPSRED_LED, blink);   //Flash red GPS LED, we have GGA but no IMU or dual
         digitalWrite(GPSGREEN_LED, LOW);   //Make sure the Green LED is OFF
@@ -157,6 +157,59 @@ void imuHandler()
 
         // the Dual heading raw
         dtostrf(heading, 4, 2, imuHeading);
+    }
+}
+
+void readBNO()
+{
+    if (bno08x.dataAvailable() == true)
+    {
+        float dqx, dqy, dqz, dqw, dacr;
+        uint8_t dac;
+
+        //get quaternion
+        bno08x.getQuat(dqx, dqy, dqz, dqw, dacr, dac);
+        float norm = sqrt(dqw * dqw + dqx * dqx + dqy * dqy + dqz * dqz);
+        dqw = dqw / norm;
+        dqx = dqx / norm;
+        dqy = dqy / norm;
+        dqz = dqz / norm;
+
+        float ysqr = dqy * dqy;
+
+        // yaw (z-axis rotation)
+        float t3 = +2.0 * (dqw * dqz + dqx * dqy);
+        float t4 = +1.0 - 2.0 * (ysqr + dqz * dqz);
+        yaw = atan2(t3, t4);
+
+        // Convert yaw to degrees x10
+        yaw = (int16_t)((yaw * -RAD_TO_DEG_X_10));
+        if (yaw < 0) yaw += 3600;
+
+        // pitch (y-axis rotation)
+        float t2 = +2.0 * (dqw * dqy - dqz * dqx);
+        t2 = t2 > 1.0 ? 1.0 : t2;
+        t2 = t2 < -1.0 ? -1.0 : t2;
+
+        // roll (x-axis rotation)
+        float t0 = +2.0 * (dqw * dqx + dqy * dqz);
+        float t1 = +1.0 - 2.0 * (dqx * dqx + ysqr);
+
+        if (steerConfig.IsUseY_Axis)
+        {
+            roll = asin(t2) * RAD_TO_DEG_X_10;
+            pitch = atan2(t0, t1) * RAD_TO_DEG_X_10;
+        }
+        else
+        {
+            pitch = asin(t2) * RAD_TO_DEG_X_10;
+            roll = atan2(t0, t1) * RAD_TO_DEG_X_10;
+        }
+
+        itoa(yaw, imuHeading, 10);
+        itoa(pitch, imuPitch, 10);
+        itoa(roll, imuRoll, 10);
+        itoa(0, imuYawRate, 10);
     }
 }
 
