@@ -280,55 +280,78 @@ void autosteerLoop()
     encEnable = true;
 
     //If connection lost to AgOpenGPS, the watchdog will count up and turn off steering
-    if (watchdogTimer++ > 250) watchdogTimer = WATCHDOG_FORCE_VALUE;
+    if (watchdogTimer++ > 250)
+    {
+        watchdogTimer = WATCHDOG_FORCE_VALUE;
+        steerSwitch = 1; // reset values like it turned off
+        currentState = 1;
+    }
 
     //read all the switches
-    workSwitch = digitalRead(WORKSW_PIN);  // read work switch
+    workSwitch = digitalRead(WORKSW_PIN);       // read work switch
 
-    if (steerConfig.SteerSwitch == 1)         //steer switch on - off
+    //Engage steering via 1 PCB Button or 2 Tablet
+
+    // 1 PCB Button pressed?
+    reading = digitalRead(STEERSW_PIN);
+
+    if (steerConfig.SteerSwitch == 1)
     {
-      steerSwitch = digitalRead(STEERSW_PIN); //read auto steer enable switch open = 0n closed = Off
+        // Switch is off so reset ready for next switch on
+        if (reading == HIGH)
+        {
+            currentState = 1;
+            steerSwitch = 1;
+            previous = reading;
+        }
     }
-    else if (steerConfig.SteerButton == 1)    //steer Button momentary
+
+    // 2 Has tablet button been pressed?
+    if (guidanceStatusChanged)
     {
-      reading = digitalRead(STEERSW_PIN);
-      if (reading == LOW && previous == HIGH)
-      {
+        if (guidanceStatus == 1)    //Must have changed Off >> On
+        {
+            currentState = 0;
+            steerSwitch = 0;
+        }
+    }
+
+    // If AOG has stopped steering, wait then turn off steerswitch ready for next engage.
+    static int switchCounter = 0;
+
+    if (steerSwitch == 0 && guidanceStatus == 0)
+    {
+        if (switchCounter++ > 30)
+        {
+            currentState = 1;
+            steerSwitch = 1;
+        }
+    }
+    else
+    {
+        switchCounter = 0;
+    }
+
+    // Arduino software button code
+    if (reading == LOW && previous == HIGH)
+    {
         if (currentState == 1)
         {
-          currentState = 0;
-          steerSwitch = 0;
+            currentState = 0;
+            steerSwitch = 0;
         }
         else
         {
-          currentState = 1;
-          steerSwitch = 1;
+            currentState = 1;
+            steerSwitch = 1;
         }
-      }
-      previous = reading;
     }
-    else                                      // No steer switch and no steer button
-    {
-      // So set the correct value. When guidanceStatus = 1,
-      // it should be on because the button is pressed in the GUI
-      // But the guidancestatus should have set it off first
-      if (guidanceStatusChanged && guidanceStatus == 1 && steerSwitch == 1 && previous == 0)
-      {
-        steerSwitch = 0;
-        previous = 1;
-      }
+    previous = reading;
 
-      // This will set steerswitch off and make the above check wait until the guidanceStatus has gone to 0
-      if (guidanceStatusChanged && guidanceStatus == 0 && steerSwitch == 0 && previous == 1)
-      {
-        steerSwitch = 1;
-        previous = 0;
-      }
-    }
-
+    // Encoder sensor?
     if (steerConfig.ShaftEncoder && pulseCount >= steerConfig.PulseCountMax)
     {
-      steerSwitch = 1; // reset values like it turned off
+      steerSwitch = 1; 
       currentState = 1;
       previous = 0;
     }
@@ -341,7 +364,7 @@ void autosteerLoop()
       sensorReading = sensorReading * 0.6 + sensorSample * 0.4;
       if (sensorReading >= steerConfig.PulseCountMax)
       {
-          steerSwitch = 1; // reset values like it turned off
+          steerSwitch = 1; 
           currentState = 1;
           previous = 0;
       }
@@ -555,7 +578,7 @@ void ReceiveUdp()
 
                 //Serial.println(gpsSpeed);
 
-                if ((bitRead(guidanceStatus, 0) == 0) || (gpsSpeed < 0.1) || (steerSwitch == 1))
+                if ((bitRead(guidanceStatus, 0) == 0) /* || (gpsSpeed < 0.1)*/ || (steerSwitch == 1))
                 {
                     watchdogTimer = WATCHDOG_FORCE_VALUE; //turn off steering motor
                 }
