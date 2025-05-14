@@ -56,6 +56,7 @@ const int32_t baudRTK = 115200;     // most are using Xbee radios with default o
 #include "BNO_RVC.h"
 #include <NativeEthernet.h>
 #include <NativeEthernetUdp.h>
+#include "DHCP.h"
 
 //Roomba Vac mode for BNO085 and data
 BNO_rvc rvc = BNO_rvc();
@@ -86,17 +87,21 @@ struct ConfigIP
 // IP & MAC address of this module of this module
 byte Eth_myip[4] = { 0, 0, 0, 0}; //This is now set via AgIO
 byte mac[] = {0x00, 0x00, 0x56, 0x00, 0x00, 0x78};
+char domainName[] = "agopengps.com";
 
 unsigned int portMy = 5120;                         // port of this module
 unsigned int AOGNtripPort = 2233;                   // port NTRIP data from AOG comes in
 unsigned int AOGAutoSteerPort = 8888;               // port Autosteer data from AOG comes in
 unsigned int portDestination = 9999;                // Port of AOG that listens
 char Eth_NTRIP_packetBuffer[serial_buffer_size];    // buffer for receiving ntrip data
+char Eth_DHCP_packetBuffer[DHCP_MESSAGE_SIZE];      // buffer for dhcp packets
 
 // An EthernetUDP instance to let us send and receive packets over UDP
 EthernetUDP Eth_udpPAOGI;     //Out port 5544
 EthernetUDP Eth_udpNtrip;     //In port 2233
 EthernetUDP Eth_udpAutoSteer; //In & Out Port 8888
+EthernetUDP Eth_udpListenDHCP; //In Port 67
+EthernetUDP Eth_udpTransmitDHCP; //Out Port 68
 
 IPAddress Eth_ipDestination;
 
@@ -275,6 +280,23 @@ void loop()
     if (SerialRTK.available())
     {
         SerialGPS->write(SerialRTK.read());
+    }
+
+    // Check for DHCP messages via UDP
+    unsigned int packetLengthDHCP = Eth_udpListenDHCP.parsePacket();
+
+    if (packetLengthDHCP > 0)
+    {
+        // read DHCP message
+        Eth_udpListenDHCP.read(Eth_DHCP_packetBuffer, packetLengthDHCP);
+
+        // generate DHCP message
+        packetLengthDHCP = DHCPreply((RIP_MSG*)Eth_DHCP_packetBuffer, packetLengthDHCP, Eth_myip, domainName);
+
+        // send DHCP message
+        Eth_udpTransmitDHCP.beginPacket(Eth_ipDestination, DHCP_CLIENT_PORT);
+        Eth_udpTransmitDHCP.write(Eth_DHCP_packetBuffer, packetLengthDHCP);
+        Eth_udpTransmitDHCP.endPacket();
     }
 
     // Check for RTK via UDP
