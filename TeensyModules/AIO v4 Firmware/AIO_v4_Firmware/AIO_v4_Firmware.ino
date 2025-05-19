@@ -100,8 +100,7 @@ char Eth_DHCP_packetBuffer[DHCP_MESSAGE_SIZE];      // buffer for dhcp packets
 EthernetUDP Eth_udpPAOGI;     //Out port 5544
 EthernetUDP Eth_udpNtrip;     //In port 2233
 EthernetUDP Eth_udpAutoSteer; //In & Out Port 8888
-EthernetUDP Eth_udpListenDHCP; //In Port 67
-EthernetUDP Eth_udpTransmitDHCP; //Out Port 68
+EthernetUDP Eth_udpDHCP; //In & Out Port 67
 
 IPAddress Eth_ipDestination;
 
@@ -283,20 +282,20 @@ void loop()
     }
 
     // Check for DHCP messages via UDP
-    unsigned int packetLengthDHCP = Eth_udpListenDHCP.parsePacket();
+    unsigned int packetLengthDHCP = Eth_udpDHCP.parsePacket();
 
     if (packetLengthDHCP > 0)
     {
         // read DHCP message
-        Eth_udpListenDHCP.read(Eth_DHCP_packetBuffer, packetLengthDHCP);
+        Eth_udpDHCP.read(Eth_DHCP_packetBuffer, packetLengthDHCP);
 
         // generate DHCP message
         packetLengthDHCP = DHCPreply((RIP_MSG*)Eth_DHCP_packetBuffer, packetLengthDHCP, Eth_myip, domainName);
 
         // send DHCP message
-        Eth_udpTransmitDHCP.beginPacket(Eth_ipDestination, DHCP_CLIENT_PORT);
-        Eth_udpTransmitDHCP.write(Eth_DHCP_packetBuffer, packetLengthDHCP);
-        Eth_udpTransmitDHCP.endPacket();
+        Eth_udpDHCP.beginPacket(Eth_ipDestination, DHCP_CLIENT_PORT);
+        Eth_udpDHCP.write(Eth_DHCP_packetBuffer, packetLengthDHCP);
+        Eth_udpDHCP.endPacket();
     }
 
     // Check for RTK via UDP

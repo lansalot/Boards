@@ -67,17 +67,10 @@ void EthernetStart()
     Serial.println(AOGAutoSteerPort);
   }
 
-  // init UPD Port getting DHCP messages
-  if (Eth_udpListenDHCP.begin(DHCP_SERVER_PORT))
+  // init UPD Port for DHCP
+  if (Eth_udpDHCP.begin(DHCP_SERVER_PORT))
   {
     Serial.print("Ethernet DHCP UDP listening to port: ");
     Serial.println(DHCP_SERVER_PORT);
-  }
-
-  // init UPD Port sending DHCP messages
-  if (Eth_udpTransmitDHCP.begin(DHCP_CLIENT_PORT))
-  {
-    Serial.print("Ethernet DHCP UDP sending from port: ");
-    Serial.println(DHCP_CLIENT_PORT);
   }
 }
