@@ -17,13 +17,13 @@
 
 /* DHCP message type */
 #define	DHCP_DISCOVER		1
-#define DHCP_OFFER		2
+#define DHCP_OFFER			2
 #define	DHCP_REQUEST		3
 #define	DHCP_DECLINE		4
-#define	DHCP_ACK		5
-#define DHCP_NAK		6
+#define	DHCP_ACK			5
+#define DHCP_NAK			6
 #define	DHCP_RELEASE		7
-#define DHCP_INFORM		8
+#define DHCP_INFORM			8
 
 #define DHCP_LEASETIME ((long)60*60*24) // Lease Time: 1 day == { 00, 01, 51, 80 }
 
@@ -39,7 +39,7 @@ struct Lease {
 	unsigned long hostcrc;
 };
 
-#define LEASESNUM 12
+#define LEASESNUM 			20
 
 /**
  * @brief	DHCP option and value (cf. RFC1533)
@@ -134,5 +134,5 @@ typedef struct RIP_MSG {
 	byte		OPT[]; // 240 offset
 };
 
-int DHCPreply(RIP_MSG *packet, int packetSize, byte *serverIP, char *domainName);
+int DHCPreply(RIP_MSG *packet, int packetSize, byte *serverIP, byte startHost, char *domainName);
 #endif

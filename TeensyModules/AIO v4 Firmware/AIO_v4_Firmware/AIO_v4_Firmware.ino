@@ -290,7 +290,7 @@ void loop()
         Eth_udpDHCP.read(Eth_DHCP_packetBuffer, packetLengthDHCP);
 
         // generate DHCP message
-        packetLengthDHCP = DHCPreply((RIP_MSG*)Eth_DHCP_packetBuffer, packetLengthDHCP, Eth_myip, domainName);
+        packetLengthDHCP = DHCPreply((RIP_MSG*)Eth_DHCP_packetBuffer, packetLengthDHCP, Eth_myip, 10, domainName);
 
         // send DHCP message
         Eth_udpDHCP.beginPacket(Eth_ipDestination, DHCP_CLIENT_PORT);
