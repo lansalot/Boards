@@ -66,4 +66,11 @@ void EthernetStart()
     Serial.print("Ethernet AutoSteer UDP listening to & send from port: ");
     Serial.println(AOGAutoSteerPort);
   }
+
+  // init UPD Port for DHCP
+  if (Eth_udpDHCP.begin(DHCP_SERVER_PORT))
+  {
+    Serial.print("Ethernet DHCP UDP listening to port: ");
+    Serial.println(DHCP_SERVER_PORT);
+  }
 }
