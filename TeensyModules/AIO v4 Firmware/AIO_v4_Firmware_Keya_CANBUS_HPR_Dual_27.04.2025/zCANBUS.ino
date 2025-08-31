@@ -30,6 +30,28 @@ uint8_t keyaEncoderSpeedResponse[] = { 0x60, 0x03, 0x21, 0x01 };
 
 uint64_t KeyaID = 0x06000001; // 0x01 is default ID
 
+uint64_t keyaConfigID = 0x06000591;
+uint8_t keyaEnterConfig[] = { 0xFA, 0xFA, 0x00, 0x00 };
+uint8_t keyaSet5Amp[] = { 0xBB, 0xBB, 0x00, 0x00, 0x00, 0x03, 0x00, 0x05 };
+uint8_t keyaStoreEEPROM[] = { 0xFA, 0xFA, 0x00, 0x08 };
+uint8_t keyaExitConfig[] = { 0xFA, 0xFA, 0x00, 0xAA };
+
+template <size_t N>
+void keyaConfig(uint8_t(&command)[N])
+{
+    if (keyaDetected)
+    {
+        CAN_message_t KeyaBusSendData;
+        KeyaBusSendData.id = keyaConfigID;
+        KeyaBusSendData.flags.extended = true;
+        KeyaBusSendData.len = N;
+        memcpy(KeyaBusSendData.buf, command, N);
+        Keya_Bus.write(KeyaBusSendData);
+        Serial.print("Keya configuration command sent with length ");
+		Serial.println(N);
+        delay(200);
+    }
+}
 
 void CAN_Setup()
 {
@@ -49,8 +71,12 @@ void KeyaBus_Receive()
 
             if (!keyaDetected)
             {
-                Serial.println("Keya heartbeat detected! Enabling Keya CANBUS");
+                Serial.println("Keya heartbeat detected! Enabling Keya CANBUS and setting 5 amp max current");
                 keyaDetected = true;
+                keyaConfig(keyaEnterConfig);
+                keyaConfig(keyaSet5Amp);
+                keyaConfig(keyaStoreEEPROM);
+                keyaConfig(keyaExitConfig);
             }
             // 0-1 - Cumulative value of angle (360 def / circle)
             // 2-3 - Motor speed, signed int eg -500 or 500
@@ -85,25 +111,6 @@ void KeyaBus_Receive()
                 sensorReading = 0;
                 counter = 0;
             }
-            /*
-            Serial.print(keyaSteeringPosition);
-            Serial.print("\t");
-            Serial.print(keyaCurrentActualSpeed);
-            Serial.print("\t");
-            Serial.print(current);
-            Serial.print("\t");
-            */
-            
-            //Serial.print(keyaCurrentSetSpeed);
-            //Serial.print("\t");
-            //Serial.print(keyaCurrentActualSpeed);
-            //Serial.print("\t");
-            //Serial.print(error);
-            //Serial.print("\t");
-            
-            
-            //if (bitRead(KeyaBusReceiveData.buf[7], 0)) Serial.print("Disabled\t");
-            //else Serial.print("Enabled \t");
             
             // check if there's any motor diag/error data and parse it
             if (KeyaBusReceiveData.buf[7] > 1 || KeyaBusReceiveData.buf[6] > 0)
@@ -130,7 +137,6 @@ void KeyaBus_Receive()
                 currentState = 1;
                 previous = 0;
             }
-
             //Serial.println();
         }
     }
@@ -192,3 +198,4 @@ void keyaCommand(uint8_t command[])
         Keya_Bus.write(KeyaBusSendData);
     }
 }
+
