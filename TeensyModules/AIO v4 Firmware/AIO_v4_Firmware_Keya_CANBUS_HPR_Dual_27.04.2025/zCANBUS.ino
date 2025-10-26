@@ -30,6 +30,7 @@ uint8_t keyaEncoderSpeedResponse[] = { 0x60, 0x03, 0x21, 0x01 };
 
 uint64_t KeyaID = 0x06000001; // 0x01 is default ID
 
+uint8_t keyaSetSpeedMode[] = { 0x03, 0x0D, 0x20, 0x11, 0x00, 0x00, 0x00, 0x00 };
 uint64_t keyaConfigID = 0x06000591;
 uint8_t keyaEnterConfig[] = { 0xFA, 0xFA, 0x00, 0x00 };
 uint8_t keyaSet5Amp[] = { 0xBB, 0xBB, 0x00, 0x00, 0x00, 0x03, 0x00, 0x05 };
@@ -47,8 +48,6 @@ void keyaConfig(uint8_t(&command)[N])
         KeyaBusSendData.len = N;
         memcpy(KeyaBusSendData.buf, command, N);
         Keya_Bus.write(KeyaBusSendData);
-        Serial.print("Keya configuration command sent with length ");
-		Serial.println(N);
         delay(200);
     }
 }
@@ -73,10 +72,19 @@ void KeyaBus_Receive()
             {
                 Serial.println("Keya heartbeat detected! Enabling Keya CANBUS and setting 5 amp max current");
                 keyaDetected = true;
+                Serial.println("Entering config mode");
                 keyaConfig(keyaEnterConfig);
+                Serial.println("Setting 5 amp");
                 keyaConfig(keyaSet5Amp);
-                keyaConfig(keyaStoreEEPROM);
+                Serial.println("Storing to EEPROM (temporarily disabled)");
+                //keyaConfig(keyaStoreEEPROM);
+                Serial.println("Exiting config mode");
                 keyaConfig(keyaExitConfig);
+                Serial.println("Short snooze..");
+                delay(2000);
+                Serial.println("Ensuring speed-mode selected");
+                keyaCommand(keyaSetSpeedMode);
+                Serial.print("Autosteer ready!");
             }
             // 0-1 - Cumulative value of angle (360 def / circle)
             // 2-3 - Motor speed, signed int eg -500 or 500
