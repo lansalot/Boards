@@ -37,6 +37,8 @@ uint8_t keyaSet5Amp[] = { 0xBB, 0xBB, 0x00, 0x00, 0x00, 0x03, 0x00, 0x05 };
 uint8_t keyaStoreEEPROM[] = { 0xFA, 0xFA, 0x00, 0x08 };
 uint8_t keyaExitConfig[] = { 0xFA, 0xFA, 0x00, 0xAA };
 
+bool keyaDebug = false;
+
 template <size_t N>
 void keyaConfig(uint8_t(&command)[N])
 {
@@ -84,7 +86,7 @@ void KeyaBus_Receive()
                 delay(2000);
                 Serial.println("Ensuring speed-mode selected");
                 keyaCommand(keyaSetSpeedMode);
-                Serial.print("Autosteer ready!");
+                Serial.println("Autosteer ready!");
             }
             // 0-1 - Cumulative value of angle (360 def / circle)
             // 2-3 - Motor speed, signed int eg -500 or 500
@@ -92,37 +94,48 @@ void KeyaBus_Receive()
             // 6-7 - Control_Close (error code)
             // TODO Yeah, if we ever see something here, fire off a disable, refuse to engage autosteer or..?
 
-            uint32_t time = millis();
-
             keyaSteeringPosition = (int16_t)((int16_t)KeyaBusReceiveData.buf[0] << 8 | (int16_t)KeyaBusReceiveData.buf[1]) * -1;
             keyaCurrentActualSpeed = (int16_t)((int16_t)KeyaBusReceiveData.buf[2] << 8 | (int16_t)KeyaBusReceiveData.buf[3]);
-            int16_t current = (int16_t)((int16_t)KeyaBusReceiveData.buf[4] << 8 | (int16_t)KeyaBusReceiveData.buf[5]);
-            
+            int16_t current = abs((int16_t)((int16_t)KeyaBusReceiveData.buf[4] << 8 | (int16_t)KeyaBusReceiveData.buf[5]));
             int16_t error = abs(keyaCurrentActualSpeed - keyaCurrentSetSpeed);
+            if (keyaDebug) {
+                Serial.print("Current: ");
+                Serial.print(current);
+                Serial.print("\tError: ");
+                Serial.print(error);
+                Serial.print("\tKCAS: ");
+                Serial.print(keyaCurrentActualSpeed);
+                Serial.print("\tKCSS: ");
+                Serial.print(keyaCurrentSetSpeed);
+            }
             static int16_t counter = 0;
             
             if (error > abs(keyaCurrentSetSpeed) + 10)
             {
                 if (counter++ < 8)
                 {
-                    //Serial.print("Counter\t");
+                    if (keyaDebug) Serial.print(" Counter\t");
                 }
                 else
                 {
-                    //Serial.print("Stop\t");
+                    if (keyaDebug) Serial.print(" Stop\t");
                     sensorReading = abs(abs(keyaCurrentSetSpeed) - error);
                 }
             }
             else
             {
-                //Serial.print("Run\t");
+                if (keyaDebug) Serial.print(" Run\t");
                 sensorReading = 0;
                 counter = 0;
             }
-            
+            if (keyaDebug) {
+                Serial.print("\tsensorReading: ");
+                Serial.print(sensorReading);
+            }
             // check if there's any motor diag/error data and parse it
             if (KeyaBusReceiveData.buf[7] > 1 || KeyaBusReceiveData.buf[6] > 0)
             {
+                if (keyaDebug) Serial.println();
                 if (bitRead(KeyaBusReceiveData.buf[7], 1)) Serial.print("Over voltage\t");
                 if (bitRead(KeyaBusReceiveData.buf[7], 2)) Serial.print("Hardware protection\t");
                 if (bitRead(KeyaBusReceiveData.buf[7], 3)) Serial.print("E2PROM\t");
@@ -145,7 +158,7 @@ void KeyaBus_Receive()
                 currentState = 1;
                 previous = 0;
             }
-            //Serial.println();
+            if (keyaDebug) Serial.println();
         }
     }
 }
