@@ -364,3 +364,6 @@ __vm/
 .vscode/
 output/
 build/
+*.sln
+*.vcxproj*
+
