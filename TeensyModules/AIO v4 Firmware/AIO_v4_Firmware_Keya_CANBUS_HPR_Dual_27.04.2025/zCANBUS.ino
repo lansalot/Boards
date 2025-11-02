@@ -79,7 +79,7 @@ void KeyaBus_Receive()
                 Serial.println("Setting 5 amp");
                 keyaConfig(keyaSet5Amp);
                 Serial.println("Storing to EEPROM (temporarily disabled)");
-                //keyaConfig(keyaStoreEEPROM);
+                keyaConfig(keyaStoreEEPROM);
                 Serial.println("Exiting config mode");
                 keyaConfig(keyaExitConfig);
                 Serial.println("Short snooze..");
