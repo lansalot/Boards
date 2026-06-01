@@ -1152,3 +1152,50 @@ Port = 5122<br>
         </tr>
     </tbody>
 </table>
+
+# Ethernet update
+<table>
+    <thead>
+        <tr>
+            <th nowrap align=center>Module</th>
+            <th nowrap align=center>Byte1Hex</th>
+            <th nowrap align=center>Byte1Dec</th>
+            <th nowrap align=center>Byte2Hex</th>
+            <th nowrap align=center>Byte2Dec</th>
+            <th nowrap align=center>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td align=center>Update Module</td>
+            <td align=center>0x15</td>
+            <td align=center>21</td>
+            <td align=center>0x80</td>
+            <td align=center>128</td>
+            <td align=left>Ethernet-update data</td>
+        </tr>
+        <tr>
+            <td align=center>Update Module</td>
+            <td align=center>0x16</td>
+            <td align=center>22</td>
+            <td align=center>0x80</td>
+            <td align=center>128</td>
+            <td align=left>Ethernet-update data</td>
+        </tr>
+        <tr>
+            <td align=center>Update Module</td>
+            <td align=center>0x17</td>
+            <td align=center>23</td>
+            <td align=center>0x80</td>
+            <td align=center>128</td>
+            <td align=left>Ethernet-update heartbeat</td>
+        </tr>
+        <tr>
+            <td align=center>Update Module</td>
+            <td align=center>0x22</td>
+            <td align=center>34</td>
+            <td align=center>0x80</td>
+            <td align=center>128</td>
+            <td align=left>Ethernet-update - receive-ready</td>
+        </tr>    </tbody>
+</table>
