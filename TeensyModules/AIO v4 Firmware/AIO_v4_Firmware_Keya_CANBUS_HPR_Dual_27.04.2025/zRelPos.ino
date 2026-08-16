@@ -1,6 +1,7 @@
 
 void relPosDecode()
 {
+    Serial.println("rpd");
     int carrSoln;
     bool gnssFixOk, diffSoln, relPosValid;
 

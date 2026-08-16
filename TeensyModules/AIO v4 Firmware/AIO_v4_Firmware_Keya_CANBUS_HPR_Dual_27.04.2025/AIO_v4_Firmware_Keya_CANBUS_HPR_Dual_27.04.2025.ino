@@ -290,6 +290,7 @@ void loop()
     // If both dual messages are ready, send to AgOpen
     if (dualReadyGGA == true && dualReadyRelPos == true)
     {
+        Serial.println("never hit!");
         BuildNmea();
         dualReadyGGA = false;
         dualReadyRelPos = false;

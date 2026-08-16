@@ -85,6 +85,7 @@ void GGA_Handler() //Rec'd GGA
 
     else if (useBNO08xRVC || useBNO08xI2C)
     {
+        Serial.println("check1");
         BuildNmea();           //Build & send data GPS data to AgIO (Both Dual & Single)
         dualReadyGGA = false;  //Force dual GGA ready false because we just sent it to AgIO based off the IMU data
         if (!useDual)
@@ -99,6 +100,7 @@ void GGA_Handler() //Rec'd GGA
         digitalWrite(GPSRED_LED, blink);   //Flash red GPS LED, we have GGA but no IMU or dual
         digitalWrite(GPSGREEN_LED, LOW);   //Make sure the Green LED is OFF
         itoa(65535, imuHeading, 10);       //65535 is max value to stop AgOpen using IMU in Panda
+        Serial.println("check2");
         BuildNmea();
     }
     
@@ -133,6 +135,7 @@ void HPR_Handler()
     useDual = true;
     imuHandler();
     BuildNmea();
+    Serial.println("check3");
     dualReadyGGA = false;
 }
 
@@ -188,6 +191,7 @@ void imuHandler()
 
     else
     {
+        Serial.println("Using Dual IMU data");
         // the roll
         dtostrf(rollDual, 4, 2, imuRoll);
 

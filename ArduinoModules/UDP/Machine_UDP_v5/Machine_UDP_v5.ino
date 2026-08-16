@@ -9,15 +9,17 @@
     struct ConfigIP {
         uint8_t ipOne = 192;
         uint8_t ipTwo = 168;
-        uint8_t ipThree = 5;
+        uint8_t ipThree = 1;
     };  ConfigIP networkAddress;   //3 bytes
     //-----------------------------------------------------------------------------------------------
+
+    #define Cytron 3
 
     #include <EEPROM.h> 
     #include <Wire.h>
     #include "EtherCard_AOG.h"
     #include <IPAddress.h>
-
+    
     // ethernet interface ip address
     static uint8_t myip[] = { 0,0,0,123 };
 
@@ -108,6 +110,13 @@
     float gpsSpeed;
     uint8_t raiseTimer = 0, lowerTimer = 0, lastTrigger = 0;
  
+    #define goButton 5
+    #define PWM 17
+    bool engageBrake = false;
+    bool movingRam = false;
+    uint16_t ramMaxTime = 1000; // milliseconds to push/pull ram
+    uint32_t ramStartTime = millis();
+
 
     void setup()
     {
@@ -166,13 +175,24 @@
         pinMode(9, OUTPUT);
 
         Serial.println("Setup complete, waiting for AgOpenGPS");
+        pinMode(goButton, INPUT_PULLUP);
 
     }
 
     void loop()
     {
+        if (ramStartTime + ramMaxTime >= millis()) {
+            movingRam = false;
+            //analogWrite(PWM, 0);
+        }
         //Loop triggers every 200 msec and sends back gyro heading, and roll, steer angle etc
-
+        if (digitalRead(goButton) == LOW && engageBrake) {
+            Serial.println("Low, disabling breaking and starting ram");
+            engageBrake = false;
+            ramStartTime = millis();
+            movingRam = true;
+            analogWrite(PWM,50);
+        }
         currentTime = millis();
 
         if (currentTime - lastTime >= LOOP_TIME)
@@ -188,73 +208,6 @@
                 while (Serial.available() > 0) Serial.read();
                 serialResetTimer = 0;
             }
-
-            if (watchdogTimer > 20)
-            {
-                if (aogConfig.isRelayActiveHigh) {
-                    relayLo = 255;
-                    relayHi = 255;
-                }
-                else {
-                    relayLo = 0;
-                    relayHi = 0;
-                }
-            }
-
-            //hydraulic lift
-
-            if (hydLift != lastTrigger && (hydLift == 1 || hydLift == 2))
-            {
-                lastTrigger = hydLift;
-                lowerTimer = 0;
-                raiseTimer = 0;
-
-                //200 msec per frame so 5 per second
-                switch (hydLift)
-                {
-                    //lower
-                case 1:
-                    lowerTimer = aogConfig.lowerTime * 5;
-                    break;
-
-                    //raise
-                case 2:
-                    raiseTimer = aogConfig.raiseTime * 5;
-                    break;
-                }
-            }
-
-            //countdown if not zero, make sure up only
-            if (raiseTimer)
-            {
-                raiseTimer--;
-                lowerTimer = 0;
-            }
-            if (lowerTimer) lowerTimer--;
-
-            //if anything wrong, shut off hydraulics, reset last
-            if ((hydLift != 1 && hydLift != 2) || watchdogTimer > 10) //|| gpsSpeed < 2)
-            {
-                lowerTimer = 0;
-                raiseTimer = 0;
-                lastTrigger = 0;
-            }
-
-            if (aogConfig.isRelayActiveHigh)
-            {
-                isLower = isRaise = false;
-                if (lowerTimer) isLower = true;
-                if (raiseTimer) isRaise = true;
-            }
-            else
-            {
-                isLower = isRaise = true;
-                if (lowerTimer) isLower = false;
-                if (raiseTimer) isRaise = false;
-            }
-
-            //section relays
-            SetRelays();
 
             //checksum
             int16_t CK_A = 0;
@@ -275,17 +228,8 @@
         ether.packetLoop(ether.packetReceive());
     }
 
-  //callback when received packets
     void udpSteerRecv(uint16_t dest_port, uint8_t src_ip[IP_LEN], uint16_t src_port, uint8_t* udpData, uint16_t len)
     {
-        /* IPAddress src(src_ip[0],src_ip[1],src_ip[2],src_ip[3]);
-        Serial.print("dPort:");  Serial.print(dest_port);
-        Serial.print("  sPort: ");  Serial.print(src_port);
-        Serial.print("  sIP: ");  ether.printIp(src_ip);  Serial.println("  end");
-
-        //for (int16_t i = 0; i < len; i++) {
-        //Serial.print(udpData[i],HEX); Serial.print("\t"); } Serial.println(len);
-        */
 
         if (udpData[0] == 0x80 && udpData[1] == 0x81 && udpData[2] == 0x7F) //Data
         {
@@ -295,20 +239,18 @@
                 uTurn = udpData[5];
                 gpsSpeed = (float)udpData[6];//actual speed times 4, single uint8_t
 
-                hydLift = udpData[7];
-                tramline = udpData[8];  //bit 0 is right bit 1 is left
+                hydLift = udpData[7]; tramline = udpData[8];  //bit 0 is right bit 1 is left
 
                 relayLo = udpData[11];          // read relay control from AgOpenGPS
                 relayHi = udpData[12];
-
-                if (aogConfig.isRelayActiveHigh)
-                {
-                    tramline = 255 - tramline;
-                    relayLo = 255 - relayLo;
-                    relayHi = 255 - relayHi;
+                if (relayLo != 0 && relayLo != 15 && !engageBrake) {
+                    // brake-state has changed!
+                    engageBrake = true;
+                    ramStartTime = 0;
+                    movingRam = true;
+                    analogWrite(PWM, 50);
+                    Serial.println("Braking and starting ram");
                 }
-
-                //Bit 13 CRC
 
                 //reset watchdog
                 watchdogTimer = 0;
@@ -406,57 +348,57 @@
         }
     }
 
-    void SetRelays(void)
-    {
-        //pin, rate, duration  130 pp meter, 3.6 kmh = 1 m/sec or gpsSpeed * 130/3.6 or gpsSpeed * 36.1111
-        //gpsSpeed is 10x actual speed so 3.61111
-        gpsSpeed *= 3.61111;
-        //tone(13, gpsSpeed);
+    // void SetRelays(void)
+    // {
+    //     //pin, rate, duration  130 pp meter, 3.6 kmh = 1 m/sec or gpsSpeed * 130/3.6 or gpsSpeed * 36.1111
+    //     //gpsSpeed is 10x actual speed so 3.61111
+    //     gpsSpeed *= 3.61111;
+    //     //tone(13, gpsSpeed);
 
-        //Load the current pgn relay state - Sections
-        for (uint8_t i = 0; i < 8; i++)
-        {
-            relayState[i] = bitRead(relayLo, i);
-        }
+    //     //Load the current pgn relay state - Sections
+    //     for (uint8_t i = 0; i < 8; i++)
+    //     {
+    //         relayState[i] = bitRead(relayLo, i);
+    //     }
 
-        for (uint8_t i = 0; i < 8; i++)
-        {
-            relayState[i + 8] = bitRead(relayHi, i);
-        }
+    //     for (uint8_t i = 0; i < 8; i++)
+    //     {
+    //         relayState[i + 8] = bitRead(relayHi, i);
+    //     }
 
-        // Hydraulics
-        relayState[16] = isLower;
-        relayState[17] = isRaise;
+    //     // Hydraulics
+    //     relayState[16] = isLower;
+    //     relayState[17] = isRaise;
 
-        //Tram
-        relayState[18] = bitRead(tramline, 0); //right
-        relayState[19] = bitRead(tramline, 1); //left
+    //     //Tram
+    //     relayState[18] = bitRead(tramline, 0); //right
+    //     relayState[19] = bitRead(tramline, 1); //left
 
-        //GeoStop
-        relayState[20] = (geoStop == 0) ? 0 : 1;
+    //     //GeoStop
+    //     relayState[20] = (geoStop == 0) ? 0 : 1;
 
-        if (pin[0]) digitalWrite(4, relayState[pin[0] - 1]);
-        if (pin[1]) digitalWrite(5, relayState[pin[1] - 1]);
-        if (pin[2]) digitalWrite(6, relayState[pin[2] - 1]);
-        if (pin[3]) digitalWrite(7, relayState[pin[3] - 1]);
+    //     if (pin[0]) digitalWrite(4, relayState[pin[0] - 1]);
+    //     if (pin[1]) digitalWrite(5, relayState[pin[1] - 1]);
+    //     if (pin[2]) digitalWrite(6, relayState[pin[2] - 1]);
+    //     if (pin[3]) digitalWrite(7, relayState[pin[3] - 1]);
 
-        if (pin[4]) digitalWrite(8, relayState[pin[4] - 1]);
-        if (pin[5]) digitalWrite(9, relayState[pin[5] - 1]);
+    //     if (pin[4]) digitalWrite(8, relayState[pin[4] - 1]);
+    //     if (pin[5]) digitalWrite(9, relayState[pin[5] - 1]);
 
-        //if (pin[6]) digitalWrite(10, relayState[pin[6]-1]);
-        //if (pin[7]) digitalWrite(11, relayState[pin[7]-1]);
+    //     //if (pin[6]) digitalWrite(10, relayState[pin[6]-1]);
+    //     //if (pin[7]) digitalWrite(11, relayState[pin[7]-1]);
 
-        //if (pin[8]) digitalWrite(12, relayState[pin[8]-1]);
-        //if (pin[9]) digitalWrite(4, relayState[pin[9]-1]);
+    //     //if (pin[8]) digitalWrite(12, relayState[pin[8]-1]);
+    //     //if (pin[9]) digitalWrite(4, relayState[pin[9]-1]);
 
-        //if (pin[10]) digitalWrite(IO#Here, relayState[pin[10]-1]);
-        //if (pin[11]) digitalWrite(IO#Here, relayState[pin[11]-1]);
-        //if (pin[12]) digitalWrite(IO#Here, relayState[pin[12]-1]);
-        //if (pin[13]) digitalWrite(IO#Here, relayState[pin[13]-1]);
-        //if (pin[14]) digitalWrite(IO#Here, relayState[pin[14]-1]);
-        //if (pin[15]) digitalWrite(IO#Here, relayState[pin[15]-1]);
-        //if (pin[16]) digitalWrite(IO#Here, relayState[pin[16]-1]);
-        //if (pin[17]) digitalWrite(IO#Here, relayState[pin[17]-1]);
-        //if (pin[18]) digitalWrite(IO#Here, relayState[pin[18]-1]);
-        //if (pin[19]) digitalWrite(IO#Here, relayState[pin[19]-1]);
-    }
+    //     //if (pin[10]) digitalWrite(IO#Here, relayState[pin[10]-1]);
+    //     //if (pin[11]) digitalWrite(IO#Here, relayState[pin[11]-1]);
+    //     //if (pin[12]) digitalWrite(IO#Here, relayState[pin[12]-1]);
+    //     //if (pin[13]) digitalWrite(IO#Here, relayState[pin[13]-1]);
+    //     //if (pin[14]) digitalWrite(IO#Here, relayState[pin[14]-1]);
+    //     //if (pin[15]) digitalWrite(IO#Here, relayState[pin[15]-1]);
+    //     //if (pin[16]) digitalWrite(IO#Here, relayState[pin[16]-1]);
+    //     //if (pin[17]) digitalWrite(IO#Here, relayState[pin[17]-1]);
+    //     //if (pin[18]) digitalWrite(IO#Here, relayState[pin[18]-1]);
+    //     //if (pin[19]) digitalWrite(IO#Here, relayState[pin[19]-1]);
+    // }
