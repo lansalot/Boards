@@ -58,6 +58,10 @@ const int32_t baudRTK = 115200;     // most are using Xbee radios with default o
 #include <NativeEthernetUdp.h>
 #include "DHCP.h"
 
+#include "EthernetUpdater.h"
+EthernetUpdater updater;
+
+
 //Roomba Vac mode for BNO085 and data
 BNO_rvc rvc = BNO_rvc();
 BNO_rvcData bnoData;
@@ -263,6 +267,7 @@ void setup()
             if (useBNO08xI2C) break;
         }
     }
+  updater.begin();
 
   Serial.println("\r\nEnd setup, waiting for GPS...\r\n");
 }
@@ -393,7 +398,7 @@ void loop()
             digitalWrite(Ethernet_Active_LED, 0);
         }
     }
-
+    updater.poll();
 }//End Loop
 //**************************************************************************
 
